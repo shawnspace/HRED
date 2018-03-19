@@ -99,7 +99,6 @@ def create_train_op(loss,lr,global_step_tensor):
     optimizer = tf.train.AdamOptimizer(lr)
     params = tf.trainable_variables()
     gradients = tf.gradients(loss, params)
-    #clipped_gradients, _ = tf.clip_by_global_norm(gradients, max_gradient_norm)
     train_op = optimizer.apply_gradients(grads_and_vars=zip(gradients, params),global_step=global_step_tensor)
     return train_op,optimizer._lr_t
 
