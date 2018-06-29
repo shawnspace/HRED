@@ -4,7 +4,6 @@ import modekeys
 import hparam
 import HRED
 from tensorflow.python.training import saver as saver_lib
-import bleu
 import numpy as np
 from tensorflow.core.framework import summary_pb2
 import os
@@ -49,14 +48,6 @@ def evaluate(eval_file,model_dir,summary_dir,train_steps):
 
 
         return avg_ppl
-
-def calculate_bleu_score(generate_response, reference_response): # should remove padding elements
-    #reference_corpus is like [[[token1, token2, token3]]]
-    reference_corpus = [[ref.tolist()] for ref in reference_response]
-    #translation corpus is like [[token1, token2]]
-    translation_corpus = [gen.tolist() for gen in generate_response]
-    result = bleu.compute_bleu(reference_corpus=reference_corpus,translation_corpus=translation_corpus)
-    return result[0]
 
 def write_to_summary(output_dir,summary_tag,summary_value,current_global_step):
     summary_writer = tf.summary.FileWriterCache.get(output_dir)
