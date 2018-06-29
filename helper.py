@@ -32,12 +32,12 @@ def load_glove_vectors(filename, vocab):
             current_idx += 1
     word_dim = len(entries)
     num_vectors = len(dct)
-    tf.logging.info("Found {} out of {} vectors in {}".format(num_vectors, len(vocab), filename))
+    tf.logging.info("Found {} out of {} vectors in {}".format(num_vectors, len(vocab),filename))
     return [np.array(vectors).reshape(num_vectors, word_dim), dct]
 
 
-def build_initial_embedding_matrix(vocab_dict, glove_dict, glove_vectors, embedding_dim,random_seed):
-    np.random.seed(random_seed)
+def build_initial_embedding_matrix(vocab_dict, glove_dict, glove_vectors, embedding_dim,seed):
+    np.random.seed(seed)
     initial_embeddings = np.random.normal(0.0, 0.1, size=(len(vocab_dict), embedding_dim), ).astype("float32")
     for word, glove_word_idx in glove_dict.items():
         word_idx = vocab_dict.get(word)

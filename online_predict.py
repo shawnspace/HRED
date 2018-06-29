@@ -5,7 +5,8 @@ import nltk
 from nltk.chunk import tree2conlltags
 import string
 import re
-import HRAN as model_impl
+import HRED as model_impl
+import input_layer
 import hparam
 import numpy as np
 
@@ -21,7 +22,7 @@ def online_prediction():
     vocab = load_vocabulary(vocab_path)
     reverse_vocab = load_reverse_vocabulary(vocab_path)
 
-    features = model_impl.create_input_layer(filename=None,hp=hp,mode=modekeys.PREDICT)
+    features = input_layer.create_input_layer(filename=None,hp=hp,mode=modekeys.PREDICT)
     results = model_impl.impl(features,modekeys.PREDICT,hp)
 
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=1.0)

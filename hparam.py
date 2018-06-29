@@ -10,8 +10,6 @@ tf.flags.DEFINE_integer("word_dim", 300, "Dimensionality of the embeddings")
 tf.flags.DEFINE_integer('word_rnn_num_units', 600, 'Num of rnn cells')
 tf.flags.DEFINE_integer('context_rnn_num_units', 1200, 'Num of rnn cells')
 tf.flags.DEFINE_integer('decoder_rnn_num_units', 1200, 'Num of rnn cells')
-tf.flags.DEFINE_integer('context_attn_units',100,'num context attn units')
-tf.flags.DEFINE_integer('utte_attn_units',100,'num utterance level attn units')
 tf.flags.DEFINE_integer('beam_width', 10, 'Num of beam_width')
 tf.flags.DEFINE_float('keep_prob', 1.0, 'the keep prob of rnn state')
 tf.flags.DEFINE_string('rnn_cell_type', 'GRU', 'the cell type in rnn')
@@ -25,7 +23,6 @@ tf.flags.DEFINE_integer('max_context_length', 20,'the max context length')
 # valid example 3907
 # test example 3894
 tf.flags.DEFINE_integer("batch_size", 32, "Batch size during training")
-tf.flags.DEFINE_integer("eval_batch_size", 64, "Batch size during evaluation")
 tf.flags.DEFINE_integer('num_epochs', 10, 'the number of epochs')
 tf.flags.DEFINE_integer('eval_step', 2000, 'eval every n steps')
 tf.flags.DEFINE_boolean('shuffle_batch',True, 'whether shuffle the train examples when batch')
@@ -39,15 +36,12 @@ HParams = namedtuple(
   [ "eval_step",
     "batch_size",
     "word_dim",
-    "eval_batch_size",
     "learning_rate",
     'vocab_size',
     "num_epochs",
     'word_rnn_num_units',
     'context_rnn_num_units',
     'decoder_rnn_num_units',
-    'context_attn_units',
-    'utte_attn_units',
     'beam_width',
     'keep_prob',
     'rnn_cell_type',
@@ -65,7 +59,6 @@ def create_hparam():
     return HParams(
         eval_step=FLAGS.eval_step,
         batch_size=FLAGS.batch_size,
-        eval_batch_size=FLAGS.eval_batch_size,
         learning_rate=FLAGS.learning_rate,
         word_dim=FLAGS.word_dim,
         vocab_size=FLAGS.vocab_size,
@@ -73,8 +66,6 @@ def create_hparam():
         word_rnn_num_units=FLAGS.word_rnn_num_units,
         context_rnn_num_units=FLAGS.context_rnn_num_units,
         decoder_rnn_num_units=FLAGS.decoder_rnn_num_units,
-        context_attn_units = FLAGS.context_attn_units,
-        utte_attn_units = FLAGS.utte_attn_units,
         beam_width=FLAGS.beam_width,
         keep_prob=FLAGS.keep_prob,
         rnn_cell_type=FLAGS.rnn_cell_type,
@@ -82,10 +73,10 @@ def create_hparam():
         max_context_length=FLAGS.max_context_length,
         shuffle_batch=FLAGS.shuffle_batch,
         summary_save_steps=FLAGS.summary_save_steps,
-        lambda_l2=0.001,
-        clip_norm=1000000000000000,
-        word_embed_path=FLAGS.word_embed_path,
-        vocab_path=FLAGS.vocab_path
+        lambda_l2 = 0.001,
+        clip_norm = 10000000000000,
+        word_embed_path = FLAGS.word_embed_path,
+        vocab_path = FLAGS.vocab_path
     )
 
 def write_hparams_to_file(hp, model_dir):

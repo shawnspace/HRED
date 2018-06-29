@@ -1,8 +1,9 @@
 import tensorflow as tf
+import input_layer
 import modekeys
 import hparam
 import os
-import HRAN
+import HRED
 from tensorflow.python.training import saver as saver_lib
 from tensorflow.python import debug as tf_debug
 import evaluate
@@ -33,17 +34,18 @@ def train():
     hp = hparam.create_hparam()
     train_graph = tf.Graph()
     with train_graph.as_default():
-        input_features = HRAN.create_input_layer(mode=modekeys.TRAIN,filename=TRAIN_FILE,hp=hp)
-        loss,debug_tensors = HRAN.impl(features=input_features,mode=modekeys.TRAIN,hp=hp)
+        input_features = input_layer.create_input_layer(filename=TRAIN_FILE,hp=hp,mode=modekeys.TRAIN)
+
+        loss,debug_tensors = HRED.impl(input_features=input_features,mode=modekeys.TRAIN,hp=hp)
         global_step_tensor = tf.Variable(initial_value=0,
                                          trainable=False,
                                          collections=[tf.GraphKeys.GLOBAL_STEP, tf.GraphKeys.GLOBAL_VARIABLES],
                                          name='global_step')
-        train_op, grad_norm = create_train_op(loss, hp.learning_rate, global_step_tensor, hp.clip_norm)
+        train_op,grad_norm = create_train_op(loss,hp.learning_rate,global_step_tensor,hp.clip_norm)
         stop_criteria_tensor = tf.Variable(initial_value=10000, trainable=False, name='stop_criteria', dtype=tf.float32)
 
         tf.summary.scalar(name='train_loss',tensor=loss)
-        tf.summary.scalar(name='train_grad_norm', tensor=grad_norm)
+        tf.summary.scalar(name='train_grad_norm',tensor=grad_norm)
         summary_op = tf.summary.merge_all()
         summary_writer = tf.summary.FileWriter(logdir=os.path.join(os.path.abspath(MODEL_DIR), 'summary'))
 
@@ -86,7 +88,7 @@ def train():
                     saver.save(sess=sess, save_path=os.path.join(MODEL_DIR, 'model.ckpt'), global_step=global_step)
                     eval_file = os.path.join(os.path.abspath(FLAGS.data_dir), 'valid.tfrecords')
                     cur_stop_criteria = evaluate.evaluate(eval_file, MODEL_DIR, os.path.join(MODEL_DIR, 'summary/eval'),
-                                                      global_step)
+                                                          global_step)
                     stop_criteria = sess.run(stop_criteria_tensor)
                     if cur_stop_criteria < stop_criteria:
                         sess.run(stop_criteria_tensor.assign(cur_stop_criteria))
@@ -95,12 +97,12 @@ def train():
                                                     global_step=tf.train.get_global_step())
                         tf.logging.info('Save best model to {}'.format(save_path))
                         stop_count = 10
+
                     else:
                         stop_count -= 1
                         if stop_count == 0:
                             tf.logging.info('Early stop at step {}'.format(global_step))
                             break
-
 
         except tf.errors.OutOfRangeError:
             tf.logging.info('Finish training -- epoch limit reached')
