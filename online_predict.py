@@ -10,7 +10,7 @@ import input_layer
 import hparam
 import numpy as np
 
-tf.flags.DEFINE_string('model_dir','model/persona_chat1/best_model','model_dir')
+tf.flags.DEFINE_string('model_dir','model/model1/best_model','model_dir')
 tf.flags.DEFINE_string('dialog_mode','multi','single or multi')
 
 MODEL_DIR = tf.flags.FLAGS.model_dir
